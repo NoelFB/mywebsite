@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 1,
+	"title": "Zymo",
+	"description": "Zymo is a little game where you type commands in to make the player do varous things. It was a fun experiment. One of my earlier games.",
+	"links": [
+		{"url": "http://www.noelberry.ca/wp-content/uploads/projects/project2/zymo.rar", "label": "Download (.exe)"}
+	]
+}

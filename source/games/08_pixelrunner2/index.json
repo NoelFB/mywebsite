@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 6,
+	"title": "Pixel Runner 2",
+	"description": "Pixel Runner 2 is a remake of one of my older games, Pixel Runner (which you can see on the games page). Pixel Runner 2 is being created in Flash using the Flash Punk Library, Flash Develop, and AS3. The general idea of the game is stay alive for as long as you can without being hit by all of the enemies and objects that fly/move around you.",
+	"links": [
+		{"url": "http://www.noelberry.ca/wp-content/uploads/projects/project8/PixelRunner2.swf", "label": "Play Online (flash)"}
+	]
+}

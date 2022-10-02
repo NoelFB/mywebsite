@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 4,
+	"title": "Red n Blue",
+	"description": "Red 'N Blue is a platform puzzle game, where you control two players, but only one at a time. You must get both Red and Blue to the Green exit door, avoiding traps, hazards, etc. The game has a bit of a twist, to make the game a little more challenging. Red cannot touch anything Blue, other than Blue himself, and Blue cannot touch anything Red, other than Red herself.",
+	"links": [
+		{"url": "http://www.noelberry.ca/wp-content/uploads/projects/project5/RednBlue.zip", "label": "Download (.exe)"}
+	]
+}

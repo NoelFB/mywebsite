@@ -1,0 +1,13 @@
+{
+	"type": "games",
+	"order": 11,
+	"title": "Abandoned",
+	"links": [
+		{"url": "http://noelberry.ca/wp-content/uploads/2011/12/Abandoned-3.swf", "label": "Play Online (flash)"},
+		{"url": "http://www.ludumdare.com/compo/ludum-dare-22/?action=preview&amp;uid=1527", "label": "Ludum Dare Page"}
+	]
+}
+---
+A game created in 48 hours for Ludum Dare 22, about a cloned astronaut stuck alone on a space station, trying to escape. Very simplistic game at this point, but I fully intend to develop it further over time and add more levels and mechanics.
+<br /><br />
+The game ended up getting 2nd Place out of over 700 games in the competition.

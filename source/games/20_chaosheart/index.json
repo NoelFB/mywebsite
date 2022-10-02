@@ -1,0 +1,7 @@
+{
+	"type": "games",
+	"order": 18,
+	"title": "Chaos Heart",
+	"description": "A game I made with a bunch of awesome people for Ludum Dare!",
+	"links": [{"url": "http://www.ludumdare.com/compo/ludum-dare-30/?action=preview&uid=1176", "label": "Ludum Dare Page + Download"}]
+}

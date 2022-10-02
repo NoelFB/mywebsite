@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 2,
+	"title": "Chimpventure",
+	"description": "My brother, Liam and I made this game over about 3 or 4 months for a Game Maker competition. At the time it was by far the most polished game we had made. Pretty proud of it at the time. I think we were 13 and 15 when we made it. Liam made all the art and music, and I programemed it. Fun times.",
+	"links": [
+		{"url": "http://www.noelberry.ca/wp-content/uploads/projects/project3/chimpventure.zip", "label": "Download (.exe)"}
+	]
+}

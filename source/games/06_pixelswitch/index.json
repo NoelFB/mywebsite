@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 4,
+	"title": "Pixel Switch",
+	"description": "Pixel Switch is a small game with 12 levels I created in 2 days. The thing about the game is that you can't jump. Instead you are able to flip the gravity 180 degrees at any time by pressing X.<br />Coincidentally, this game is pretty similar to Terry Cavanagh's VVVVVV (which is way better and you should all go check out if you haven't)",
+	"links": [
+		{"url": "http://www.noelberry.ca/wp-content/uploads/projects/project6/PixelSwitch%201_1.zip", "label": "Download (.exe)"}
+	]
+}

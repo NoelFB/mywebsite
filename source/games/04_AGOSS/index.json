@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 3,
+	"title": "AGOSS",
+	"description": "Agoss is a simplistic abstract shooter in which you control a little ball, out to shoot all the crazy shapes that are flying towards it. The game contains 4 different types of enemies (although they all basically look the same), and weird art",
+	"links": [
+		{"url": "http://www.noelberry.ca/wp-content/uploads/projects/project4/agoss.zip", "label": "Download (.exe)"}
+	]
+}

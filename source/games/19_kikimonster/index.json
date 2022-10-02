@@ -1,0 +1,14 @@
+{
+	"type": "games",
+	"order": 17,
+	"title": "Kiki and the Monster",
+	"links": [
+		{"url": "http://noelberry.ca/content/games/kiki/KikiAndTheMonster.zip", "label": "Download"}
+	]
+}
+---
+A game created in 48 hours with <a href="http://twitter.com/amora_b">Amora</a> and <a href="http://twitter.com/saint11">Pedro</a> of Miniboss doing art, and <a href="http://twitter.com/infinite_ammo">Alec</a> doing music. Thanks to <a href="http://twitter.com/maddythorson">Maddy</a> for design help. FullIndie Jam, 2013. Inspired by the SNES games Pocky and Rocky.
+<br /><br />
+If you have 2 xbox controllers, definitely give co-op a try!
+<br /><br />
+You will need the <a href="http://www.microsoft.com/en-ca/download/details.aspx?id=20914">XNA redistributable</a> installed to play.

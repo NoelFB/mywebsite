@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 8,
+	"title": "The Depths",
+	"description": "A quick game I made in a day - mostly just porting my older game, The Plunge, to flash. However, I did make a few changes here and there.",
+	"links": [
+		{"url": "http://www.kongregate.com/games/Drazzke/the-depths", "label": "Play Online (flash)"}
+	]
+}

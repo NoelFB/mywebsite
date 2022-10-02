@@ -1,0 +1,7 @@
+{
+	"type": "games",
+	"order": 19,
+	"title": "Celeste Classic",
+	"description": "A game about climbing a Mountain I created with Maddy Thorson in 4 days with PICO-8.",
+	"links": [{"url": "http://www.lexaloffle.com/bbs/?tid=2145&pid=11724&autoplay=1#pp", "label": "play online"}]
+}

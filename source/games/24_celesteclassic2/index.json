@@ -1,0 +1,10 @@
+{
+	"type": "games",
+	"order": 20,
+	"title": "Celeste Classic 2",
+	"links": [
+		{"url": "https://mattmakesgames.itch.io/celeste-classic-2", "label": "Play it"},
+	]
+}
+---
+A game created in 72 hours with <a href="https://twitter.com/kuraine">Lena Raine</a> and <a href="https://twitter.com/maddythorson">Maddy Thorson</a> for Celeste's 3rd anniversay.

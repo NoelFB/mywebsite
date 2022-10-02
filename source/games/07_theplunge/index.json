@@ -1,0 +1,9 @@
+{
+	"type": "games",
+	"order": 5,
+	"title": "The Plunge",
+	"description": "The Plunge is a small arcade game I made in a few days. The goal of the game is to go as deep into an endless tunnel, collecting as many gold stones as you can, while avoiding rocks and the tunnel walls.",
+	"links": [
+		{"url": "http://www.noelberry.ca/wp-content/uploads/projects/project7/theplunge.zip", "label": "Download (.exe)"}
+	]
+}
