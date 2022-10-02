@@ -120,7 +120,8 @@ class Program
 		Dictionary<String, String> partials = new Dictionary<string, string>();
 
 		// delete public dir
-		Directory.Delete("public", true);
+		if (Directory.Exists("public"))
+			Directory.Delete("public", true);
 		Directory.CreateDirectory("public");
 
 		// load partials
