@@ -3,7 +3,8 @@
 	"order": 19,
 	"disqus": "yearsofgamedev",
 	"oldurl": "2012/07/years-of-game-development-adventures",
-	"title": "(2012) Years of Game Development Adventures"
+	"title": "(2012) Years of Game Development Adventures",
+	"visible": false
 }
 ---
 *Moved from an old blog*

@@ -4,7 +4,8 @@
 	"date": "Jan 1, 2015",
 	"description": "Breakdown of NES limitations",
 	"oldurl": "/nes",
-	"disqus": "nes-restrictions"
+	"disqus": "nes-restrictions",
+	"visible": false
 }
 ---
 *Moved from an old blog*

@@ -1,5 +1,10 @@
+html {
+	font-family: "Lato", sans-serif;
+	font-weight: 400;
+	font-style: normal;
+}
+
 body {
-	font-family: Lato,arial,sans-serif;
 	color: #272446;
 	background: #e1dacd;
 	font-size: 1.1em;
@@ -141,7 +146,7 @@ a:hover {
 .games .entry:nth-child(n+11) .preview { display: none; }
 .games .entry:nth-child(n+11) .title { opacity: 1.0; color: #000; font-size: 1.0em; position: relative; text-align: left; filter: none; transform: translateY(0); }
 .games .entry:nth-child(n+11):hover .title { transform: translateY(0); padding-left: 16px; }
-.games .entry:nth-child(n+11) .title::before { content: " 🡺" }
+.games .entry:nth-child(n+11) .title::before { content: " >"; font-family: sans-serif;  }
 
 /* Writings */
 
@@ -239,7 +244,7 @@ a:hover {
 }
 
 .post-links a::before {
-	content: " 🡺"
+	content: " >"
 }
 
 /* Footer */
@@ -263,8 +268,8 @@ a:hover {
 /* Misc. */
 
 .button-in::after {
-	content: " 🡺"
+	content: " >"
 }
 .button-out::before {
-	content: "🡸 "
+	content: "< "
 }

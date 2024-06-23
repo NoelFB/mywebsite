@@ -1,24 +1,21 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.RegularExpressions;
 
-class Entry
+partial class Entry
 {
-	public String name = "";
-	public Dictionary<String, String> variables = new Dictionary<string, string>();
-	public String source_path;
-	public bool valid = false;
+	public readonly string Name = "";
+	public readonly Dictionary<string, string> Variables = [];
+	public readonly string SourcePath;
+	public readonly bool Valid = false;
 	
-	public Entry(String path)
+	public Entry(string path)
 	{
-		source_path = path;
+		SourcePath = path;
 
-		var index_path = Path.Combine(source_path, "index.json");
+		var index_path = Path.Combine(SourcePath, "index.json");
 		if (!File.Exists(index_path))
 		{
-			index_path = Path.Combine(source_path, "index.md");
+			index_path = Path.Combine(SourcePath, "index.md");
 			if (!File.Exists(index_path))
 				return;
 		}
@@ -36,15 +33,15 @@ class Entry
 			var key = entry.Name.ToLower();
 			if (key == "links" && entry.Value.ValueKind == JsonValueKind.Array)
 			{
-				String links = "";
+				string links = "";
 
 				foreach (var link_entry in entry.Value.EnumerateArray())
 				{
 					if (link_entry.ValueKind != JsonValueKind.Object)
 						continue;
 
-					String link_url = "";
-					String link_label = "";
+					string link_url = "";
+					string link_label = "";
 
 					foreach (var pair in link_entry.EnumerateObject())
 					{
@@ -55,69 +52,81 @@ class Entry
 					links += $"<a href=\"{link_url}\">{link_label}</a><br />\n";
 				}
 
-				variables.Add("links", links);
+				Variables.Add("links", links);
 			}
 			else if (entry.Value.ValueKind == JsonValueKind.String)
 			{
-				variables.Add(entry.Name, entry.Value.GetString() ?? "");
+				Variables.Add(entry.Name, entry.Value.GetString() ?? "");
+			}
+			else if (entry.Value.ValueKind == JsonValueKind.Number)
+			{
+				Variables.Add(entry.Name, entry.Value.GetDouble().ToString());
+			}
+			else if (entry.Value.ValueKind == JsonValueKind.True)
+			{
+				Variables.Add(entry.Name, "true");
+			}
+			else if (entry.Value.ValueKind == JsonValueKind.False)
+			{
+				Variables.Add(entry.Name, "false");
 			}
 		}
 
 		// add page title
-		if (variables.TryGetValue("title", out string? title))
-			variables.Add("page_title", " :: " + (title ?? ""));
+		if (Variables.TryGetValue("title", out string? title))
+			Variables.Add("page_title", " :: " + (title ?? ""));
 
 		// add body, fall back to description
-		if (desc.Length <= 0 && variables.TryGetValue("description", out string? description) && description != null)
-			variables.Add("body", description);
+		if (desc.Length <= 0 && Variables.TryGetValue("description", out string? description) && description != null)
+			Variables.Add("body", description);
 		else
-			variables.Add("body", desc);
+			Variables.Add("body", desc);
 
-		if (variables.ContainsKey("body"))
-			variables["body"] = Markdown.Parse(variables["body"]);
+		if (Variables.TryGetValue("body", out string? value))
+			Variables["body"] = Markdown.Parse(value);
 
 		// preview / postcard
-		if (File.Exists(Path.Combine(source_path, "preview.png")))
-			variables.Add("preview", "preview.png");
-		if (File.Exists(Path.Combine(source_path, "postcard.png")))
-			variables.Add("postcard", "postcard.png");
+		if (File.Exists(Path.Combine(SourcePath, "preview.png")))
+			Variables.Add("preview", "preview.png");
+		if (File.Exists(Path.Combine(SourcePath, "postcard.png")))
+			Variables.Add("postcard", "postcard.png");
 
 		// adjust name to skip past numerics of name (000_NAME becomes NAME)
-		name = Path.GetFileNameWithoutExtension(path);
-		while (name.Length > 0 && ((name[0] >= '0' && name[0] <= '9') || name[0] == '_'))
-			name = name.Substring(1);
+		Name = Path.GetFileNameWithoutExtension(path);
+		while (Name.Length > 0 && ((Name[0] >= '0' && Name[0] <= '9') || Name[0] == '_'))
+			Name = Name[1..];
 
 		// we good here
-		valid = true;
+		Valid = true;
 	}
 
-	public String Generate(String template)
+	public string Generate(string template)
 	{
-		String result = template;
-		foreach (var variable in variables)
+		string result = template;
+		foreach (var variable in Variables)
 			result = result.Replace($"{{{{{variable.Key}}}}}", variable.Value);
 
-		result = Regex.Replace(result, @"\{\{.*?\}\}", "");
+		result = TemplateRegex().Replace(result, "");
 
 		return result;
 	}
 
-	public void CopyFiles(String destination)
+	public void CopyFiles(string destination)
 	{
-		foreach (var file in Directory.EnumerateFiles(source_path))
+		foreach (var file in Directory.EnumerateFiles(SourcePath))
 			if (!file.EndsWith(".json"))
 				File.Copy(file, Path.Combine(destination, Path.GetFileName(file)));
 	}
+
+    [GeneratedRegex(@"\{\{.*?\}\}")]
+    private static partial Regex TemplateRegex();
 }
 
 class Program
 {
 	static void Main(string[] args)
 	{
-		String rel = "/";
-		List<String> content_types = new List<String> { "games", "posts" };
-		Dictionary<String, List<Entry>> entries = new Dictionary<string, List<Entry>>();
-		Dictionary<String, String> partials = new Dictionary<string, string>();
+		var rel = "/";
 
 		// delete public dir
 		if (Directory.Exists("public"))
@@ -125,63 +134,71 @@ class Program
 		Directory.CreateDirectory("public");
 
 		// load partials
+		var partials = new Dictionary<string, string>();
 		foreach (var file in Directory.EnumerateFiles("source/partials"))
 			partials.Add(Path.GetFileNameWithoutExtension(file).ToLower(), File.ReadAllText(file));
 
-		// load template file for games/posts
-		var template = LoadTemplate("source/post.html", partials);
-
-		// construct all content types
-		foreach (var type in content_types)
+		// create content types (games, posts)
+		var entries = new Dictionary<string, List<Entry>>();
 		{
-			var input_path = Path.Combine($"source/{type}");
-			var output_path = Path.Combine($"public/{type}");
+			var template = LoadTemplate("source/post.html", partials);
+			var contentTypes = new string[] { "games", "posts" };
 			
-			// clear existing
-			if (Directory.Exists(output_path))
-				Directory.Delete(output_path, true);
-
-			// load entries
-			entries.Add(type, new List<Entry>());
-			foreach (var file in Directory.EnumerateDirectories(input_path))
-				entries[type].Add(new Entry(file));
-			entries[type].Reverse();
-
-			// generate entries
-			Directory.CreateDirectory(output_path);
-
-			foreach (var entry in entries[type])
+			foreach (var type in contentTypes)
 			{
-				if (!entry.valid)
-					continue;
-
-				entry.variables["rel"] = rel;
-				entry.variables["path"] = $"{type}/{entry.name}";
-				entry.variables["url"] = $"{entry.variables["path"]}/index.html";
+				var inputPath = Path.Combine($"source/{type}");
+				var outputPath = Path.Combine($"public/{type}");
 				
-				Directory.CreateDirectory($"public/{entry.variables["path"]}");
-				File.WriteAllText($"public/{entry.variables["url"]}", entry.Generate(template));
-				entry.CopyFiles($"public/{entry.variables["path"]}");
+				// clear existing
+				if (Directory.Exists(outputPath))
+					Directory.Delete(outputPath, true);
+
+				// load entries
+				entries.Add(type, []);
+				foreach (var file in Directory.EnumerateDirectories(inputPath))
+					entries[type].Add(new Entry(file));
+				entries[type].Reverse();
+
+				// generate entries
+				Directory.CreateDirectory(outputPath);
+
+				foreach (var entry in entries[type])
+				{
+					if (!entry.Valid)
+						continue;
+
+					entry.Variables["rel"] = rel;
+					entry.Variables["path"] = $"{type}/{entry.Name}";
+					entry.Variables["url"] = $"{entry.Variables["path"]}/index.html";
+					
+					Directory.CreateDirectory($"public/{entry.Variables["path"]}");
+					File.WriteAllText($"public/{entry.Variables["url"]}", entry.Generate(template));
+					entry.CopyFiles($"public/{entry.Variables["path"]}");
+				}
 			}
 		}
 
 		// construct index.html
 		{
-			Dictionary<String, String> variables = new () {
+			var variables = new Dictionary<string, string>()
+			{
 				{ "rel", rel },
 				{ "page_title", "" },
 			};
 
-			String result = LoadTemplate("source/index.html", partials, variables);
+			var result = LoadTemplate("source/index.html", partials, variables);
 			foreach (var type in entries)
 			{
-				String list = "";
+				var list = "";
 
 				foreach (var entry in type.Value)
 				{
+					if (entry.Variables.TryGetValue("visible", out var vis) && vis == "false")
+						continue;
+
 					// override specific variables
-					foreach (KeyValuePair<String, String> v in variables)
-						entry.variables[v.Key] = v.Value;
+					foreach (KeyValuePair<string, string> v in variables)
+						entry.Variables[v.Key] = v.Value;
 
 					list += entry.Generate(partials[$"{type.Key}_entry"]) + "\n";
 				}
@@ -192,20 +209,20 @@ class Program
 		}
 
 		// copy "content" files 1-1
-		var content_src_path = Path.Combine(Directory.GetCurrentDirectory(), "source/content"); 
-		foreach (var file in Directory.EnumerateFiles(content_src_path, "*.*", SearchOption.AllDirectories))
+		var contentSrcPath = Path.Combine(Directory.GetCurrentDirectory(), "source/content"); 
+		foreach (var file in Directory.EnumerateFiles(contentSrcPath, "*.*", SearchOption.AllDirectories))
 		{
-			var file_dest = Path.Combine("public", Path.GetRelativePath(content_src_path, file));
-			var file_subdir = Path.GetDirectoryName(file_dest);
-			if (!String.IsNullOrWhiteSpace(file_subdir) && !Directory.Exists(file_subdir))
-				Directory.CreateDirectory(file_subdir); 
-			File.Copy(file, file_dest);
+			var fileDst = Path.Combine("public", Path.GetRelativePath(contentSrcPath, file));
+			var fileSubDir = Path.GetDirectoryName(fileDst);
+			if (!string.IsNullOrWhiteSpace(fileSubDir) && !Directory.Exists(fileSubDir))
+				Directory.CreateDirectory(fileSubDir); 
+			File.Copy(file, fileDst);
 		}
 	}
 
-	static String LoadTemplate(String file, Dictionary<String, String> partials, Dictionary<String, String>? variables = null)
+	static string LoadTemplate(string file, Dictionary<string, string> partials, Dictionary<string, string>? variables = null)
 	{
-		String result = File.ReadAllText(file);
+		var result = File.ReadAllText(file);
 
 		foreach (var partial in partials)
 			result = result.Replace($"{{{{partial:{partial.Key}}}}}", partial.Value);
@@ -220,16 +237,16 @@ class Program
 	}
 }
 
-class Markdown
+partial class Markdown
 {
 	public static string Parse(string text)
 	{
 		// hacky mardown parser
 		
 		text = text.Replace("\r", "");
-		text = Regex.Replace(text, @"\n\s?### (.*)\n", "<h3>$1</h3>");
-		text = Regex.Replace(text, @"\n\s?## (.*)\n", "<h2>$1</h2>");
-		text = Regex.Replace(text, @"\n\s?# (.*)\n", "<h1>$1</h1>");
+		text = H3().Replace(text, "<h3>$1</h3>");
+		text = H2().Replace(text, "<h2>$1</h2>");
+		text = H1().Replace(text, "<h1>$1</h1>");
 
 		text = text.Replace("\n<h", "<h");
 		text = text.Replace("\n<ul>", "<ul>");
@@ -241,11 +258,19 @@ class Markdown
 		text = text.Replace("</h3>\n", "</h3>");
 		text = text.Replace("\n\n", "<br /><br />");
 
-		text = Regex.Replace(text, @"\*\*([^\*]*)\*\*", "<b>$1</b>");
-		text = Regex.Replace(text, @"\*([^\*]*)\*", "<i>$1</i>");
-		text = Regex.Replace(text, @"!\[(.*?)\]\((.*?)\)", "<img alt='$1' src='$2' />");
-		text = Regex.Replace(text, @"\[(.*?)\]\((.*?)\)", "<a href='$2'>$1</a>");
+		text = Bold().Replace(text, "<b>$1</b>");
+		text = Italic().Replace(text, "<i>$1</i>");
+		text = Img().Replace(text, "<img alt='$1' src='$2' />");
+		text = Link().Replace(text, "<a href='$2'>$1</a>");
 
 		return text;
 	}
+
+    [GeneratedRegex(@"\n\s?### (.*)\n")] private static partial Regex H3();
+    [GeneratedRegex(@"\n\s?## (.*)\n")] private static partial Regex H2();
+    [GeneratedRegex(@"\n\s?# (.*)\n")] private static partial Regex H1();
+    [GeneratedRegex(@"\*\*([^\*]*)\*\*")] private static partial Regex Bold();
+    [GeneratedRegex(@"\*([^\*]*)\*")] private static partial Regex Italic();
+    [GeneratedRegex(@"!\[(.*?)\]\((.*?)\)")] private static partial Regex Img();
+    [GeneratedRegex(@"\[(.*?)\]\((.*?)\)")] private static partial Regex Link();
 }
