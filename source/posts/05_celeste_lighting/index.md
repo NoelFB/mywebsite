@@ -2,6 +2,8 @@
 	"title": "Remaking Celeste's Lighting",
 	"date": "Sep 25, 2017",
 	"description": "A technical breakdown on the lighting in Celeste",
+	"mastodon_account": "https://mastodon.social/@noelfb",
+	"mastodon_post": "114361360192032882"
 }
 ---
 A large part of [Celeste](http://www.celestegame.com/) is its mood and atmosphere. We’re trying very hard to make it feel like you’re exploring (and overcoming) a Mountain, and so lighting plays an important role.
