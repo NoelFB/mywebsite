@@ -2,15 +2,26 @@
 
 			<div class="post">
 				<h1>{{title}}</h1>
-				<img class="postcard" src="{{postcard}}" alt="{{title}} Postcard Image"/>
+				{{if:postcard}}<img class="postcard" src="{{postcard}}" alt="{{title}} Postcard Image"/>{{end}}
+				{{if:date}}<h3><i>{{date}}</i></h3><br/>{{end}}
 				
 				<div class="post-body">
-					{{body}}
+					{{embed:body}}
 				</div>
 
+				{{if:links}}
 				<div class="post-links">
-					{{links}}
+					{{embed:links}}
 				</div>
+				{{end}}
+
+				{{if:mastodon_account}}
+				<div class="post-replies">
+					<h1><a href="{{mastodon_account}}/{{mastodon_post}}">Mastodon Replies</a></h1>
+					<div class="replies"><a class="mastodon-thread" href="{{mastodon_account}}" data-toot-id="{{mastodon_post}}">Loading Replies...</a></div>
+					<script type="module" src="https://esm.sh/emfed@1"></script>
+				</div>
+				{{end}}
 			</div>
 
 {{partial:footer}}

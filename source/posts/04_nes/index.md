@@ -52,7 +52,7 @@ a bunch of Zelda 1 and Zelda 2. I needed a place to write them all down, and so 
 		**Note on 8 x 16 Mode**<br />
 		In 8 x 16 Sprite mode, the game only has access to 128 sprites (the size of the sprite texture does not change). Every second tile in the texture is used along with the first one, 8px below it.<br />
 		For example, if you draw Sprite[0], it will draw Sprite[0] *and also* draw Sprite[1] 8 pixels below it. You MUST only draw even sprites (so Sprite[0]+Sprite[1], never Sprite[1]+Sprite[2])<br />
-		![Example Image]({{rel}}img/writings/nes/spritetiles.png)
+		![Example Image]({{path}}/spritetiles.png)
 	</li>
 	<li>Each sprite can only use 1 palette (but you can overlap multiple sprites with transparency, ex. Megaman)</li>
 	<li>You can only have 64 sprites on the screen at once</li>

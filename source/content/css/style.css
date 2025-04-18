@@ -247,6 +247,80 @@ a:hover {
 	content: " >"
 }
 
+/* Mastodon Replies */
+
+.post-replies {
+	width: 100%;
+	margin-top: 30px;
+}
+
+.post-replies .replies {
+	width: 100%;
+}
+
+.post-replies ol {
+	padding: 0;
+	margin: 0;
+}
+
+.post-replies ol li {
+	list-style-type: none;
+	background: #f3eae5;
+	border-radius: 4px;
+	padding: 16px;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+}
+.post-replies ol li:nth-child(1) { display: none; }
+
+.toot .user {
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: space-evenly;
+	align-content: flex-start;
+	height: 46px;
+	column-gap: 0.5rem;
+	text-decoration: none;
+	color: inherit;
+}
+.toot .avatar {
+	border-radius: 4px;
+}
+.toot .display-name {
+	font-weight: bold;
+	width:100%;
+	flex: 1;
+	height: 16px;
+	font-size: 0.9em;
+	display: block;
+}
+.toot .username {
+	display: block;
+	width:100%;
+	flex: 1;
+	height: 16px;
+	font-size: 0.8em;
+	color: #999;
+}
+.toot .permalink {
+	text-decoration: none;
+	display: block;
+	color: #999;
+	float: right;
+	font-size: 0.8em;
+}
+.toot .permalink:hover {
+	text-decoration: underline;
+}
+.toot .body {
+	clear: both;
+}
+.toot .body a {
+	overflow-wrap: anywhere;
+}
+.toot .body p { margin: 0; }
+
+
 /* Footer */
 
 .footer {

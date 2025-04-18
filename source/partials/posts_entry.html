@@ -1,5 +1,5 @@
-<a href="{{rel}}{{url}}" class="entry">
+<a href="{{url}}" class="entry">
 	<h2>{{title}}</h2>
-	<h3>{{date}}</h3>
-	<p>{{description}}</p>
+	{{if:date}}<h3>{{date}}</h3>{{end}}
+	{{if:description}}<p>{{description}}</p>{{end}}
 </a>

@@ -1,16 +1,21 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 partial class Entry
 {
 	public readonly string Name = "";
+	public readonly string Type;
 	public readonly Dictionary<string, string> Variables = [];
 	public readonly string SourcePath;
 	public readonly bool Valid = false;
+	public readonly string DestPath = string.Empty;
 	
-	public Entry(string path)
+	public Entry(string path, string rel, string type)
 	{
 		SourcePath = path;
+		Type = type;
 
 		var index_path = Path.Combine(SourcePath, "index.json");
 		if (!File.Exists(index_path))
@@ -96,19 +101,14 @@ partial class Entry
 		while (Name.Length > 0 && ((Name[0] >= '0' && Name[0] <= '9') || Name[0] == '_'))
 			Name = Name[1..];
 
+		// add built in vars
+		Variables["rel"] = rel;
+		Variables["path"] = $"{rel}{type}/{Name}";
+		Variables["url"] = $"{Variables["path"]}/index.html";
+
 		// we good here
+		DestPath = $"{type}/{Name}";
 		Valid = true;
-	}
-
-	public string Generate(string template)
-	{
-		string result = template;
-		foreach (var variable in Variables)
-			result = result.Replace($"{{{{{variable.Key}}}}}", variable.Value);
-
-		result = TemplateRegex().Replace(result, "");
-
-		return result;
 	}
 
 	public void CopyFiles(string destination)
@@ -117,9 +117,136 @@ partial class Entry
 			if (!file.EndsWith(".json"))
 				File.Copy(file, Path.Combine(destination, Path.GetFileName(file)));
 	}
+}
 
-    [GeneratedRegex(@"\{\{.*?\}\}")]
-    private static partial Regex TemplateRegex();
+class Generator
+{
+	public readonly Dictionary<string, string> Partials = new(StringComparer.OrdinalIgnoreCase);
+	public readonly Dictionary<string, List<Entry>> Entries = new(StringComparer.OrdinalIgnoreCase);
+
+	public Generator(string path, string[] entryTypes, string rel)
+	{
+		foreach (var file in Directory.EnumerateFiles(Path.Combine(path, "partials")))
+		{
+			Partials.Add(Path.GetFileNameWithoutExtension(file), File.ReadAllText(file));
+		}
+
+		foreach (var type in entryTypes)
+		{
+			Entries[type] = [];
+			foreach (var dir in Directory.EnumerateDirectories(Path.Combine(path, type)))
+				Entries[type].Add(new Entry(dir, rel, type));
+		}
+	}
+
+	public string Generate(string template, Dictionary<string, string> variables)
+	{
+		StringBuilder result = new();
+
+		var src = template.AsSpan();
+		for (int i = 0; i < src.Length; i ++)
+		{
+			if (src[i..].StartsWith("{{"))
+			{
+				int start = i + 2;
+				int end = start;
+				while (end < src.Length && !src[end..].StartsWith("}}"))
+					end++;
+				if (end >= src.Length)
+				{
+					i = end ;
+					continue;
+				}
+
+				var cmd = src.Slice(start, end - start);
+
+				// handle if statement
+				if (cmd.StartsWith("if:"))
+				{
+					var condition = cmd[3..].ToString();
+					if (!variables.TryGetValue(condition, out var value) || string.IsNullOrEmpty(value) || value == "false")
+					{
+						// skip to end
+						var j = end;
+						var d = 1;
+						while (j < src.Length)
+						{
+							if (src[j..].StartsWith("{{if:"))
+								d++;
+							else if (src[j..].StartsWith("{{end"))
+							{
+								d--;
+								if (d <= 0)
+								{
+									end = j + 5;
+									break;
+								}
+							}
+							j++;
+						}
+					}
+				}
+				// ignore end statement
+				else if (cmd.StartsWith("end"))
+				{
+					// ...
+				}
+				// list entries
+				else if (cmd.StartsWith("list:"))
+				{
+					var list = "";
+					var kind = cmd[5..].ToString();
+					var entries = Entries[kind];
+
+					for (int j = entries.Count - 1; j >= 0; j --)
+					{
+						var entry = entries[j];
+						if (entry.Variables.TryGetValue("visible", out var vis) && vis == "false")
+							continue;
+
+						// override specific variables
+						var vars = new Dictionary<string, string>();
+						foreach (var kv in entry.Variables)
+							vars[kv.Key] = kv.Value;
+						foreach (var kv in variables)
+							vars[kv.Key] = kv.Value;
+						list += Generate(Partials[$"{kind}_entry"], vars) + "\n";
+					}
+
+					result.Append(list);
+				}
+				// embed partial
+				else if (cmd.StartsWith("partial:"))
+				{
+					result.Append(Generate(Partials[cmd[8..].ToString()], variables));
+				}
+				// embed variable as content (run generator on var)
+				else if (cmd.StartsWith("embed:") && variables.TryGetValue(cmd[6..].ToString(), out var embedding))
+				{
+					result.Append(Generate(embedding, variables));
+				}
+				// embed variable as-is
+				else if (variables.TryGetValue(cmd.ToString(), out var value))
+				{
+					result.Append(value);
+				}
+				// missing value
+				else
+				{
+					result.Append("{{MISSING}}");
+				}
+				
+				// skip to end of cmd
+				i = end + 2 - 1;
+			}
+			else
+			{
+				result.Append(src[i]);
+			}
+		}
+
+		return result.ToString();
+	}
 }
 
 class Program
@@ -128,55 +255,21 @@ class Program
 	{
 		var rel = "/";
 
+		var root = Directory.GetCurrentDirectory();
+		while(!File.Exists(Path.Combine(root, "noelfb2022.csproj")))
+			root = Path.Combine(root, "..");
+		Directory.SetCurrentDirectory(root);
+
 		// delete public dir
 		if (Directory.Exists("public"))
 			Directory.Delete("public", true);
 		Directory.CreateDirectory("public");
 
-		// load partials
-		var partials = new Dictionary<string, string>();
-		foreach (var file in Directory.EnumerateFiles("source/partials"))
-			partials.Add(Path.GetFileNameWithoutExtension(file).ToLower(), File.ReadAllText(file));
+		var generator = new Generator("source", ["games", "posts"], rel);
 
-		// create content types (games, posts)
-		var entries = new Dictionary<string, List<Entry>>();
-		{
-			var template = LoadTemplate("source/post.html", partials);
-			var contentTypes = new string[] { "games", "posts" };
-			
-			foreach (var type in contentTypes)
-			{
-				var inputPath = Path.Combine($"source/{type}");
-				var outputPath = Path.Combine($"public/{type}");
-				
-				// clear existing
-				if (Directory.Exists(outputPath))
-					Directory.Delete(outputPath, true);
-
-				// load entries
-				entries.Add(type, []);
-				foreach (var file in Directory.EnumerateDirectories(inputPath))
-					entries[type].Add(new Entry(file));
-				entries[type].Reverse();
-
-				// generate entries
-				Directory.CreateDirectory(outputPath);
-
-				foreach (var entry in entries[type])
-				{
-					if (!entry.Valid)
-						continue;
-
-					entry.Variables["rel"] = rel;
-					entry.Variables["path"] = $"{type}/{entry.Name}";
-					entry.Variables["url"] = $"{entry.Variables["path"]}/index.html";
-					
-					Directory.CreateDirectory($"public/{entry.Variables["path"]}");
-					File.WriteAllText($"public/{entry.Variables["url"]}", entry.Generate(template));
-					entry.CopyFiles($"public/{entry.Variables["path"]}");
-				}
-			}
-		}
+		// templates
+		var indexTemplate = File.ReadAllText("source/index.html");
+		var postTemplate = File.ReadAllText("source/post.html");
 
 		// construct index.html
 		{
@@ -186,26 +279,27 @@ class Program
 				{ "page_title", "" },
 			};
 
-			var result = LoadTemplate("source/index.html", partials, variables);
-			foreach (var type in entries)
-			{
-				var list = "";
-
-				foreach (var entry in type.Value)
-				{
-					if (entry.Variables.TryGetValue("visible", out var vis) && vis == "false")
-						continue;
-
-					// override specific variables
-					foreach (KeyValuePair<string, string> v in variables)
-						entry.Variables[v.Key] = v.Value;
-
-					list += entry.Generate(partials[$"{type.Key}_entry"]) + "\n";
-				}
-
-				result = result.Replace($"{{{{list:{type.Key}}}}}", list);
-			}
+			var result = generator.Generate(indexTemplate, variables);
 			File.WriteAllText("public/index.html", result);
+		}
+
+		// construct post entries
+		foreach (var (type, entries) in generator.Entries)
+		{
+			var outputPath = Path.Combine($"public/{type}");
+			if (Directory.Exists(outputPath))
+				Directory.Delete(outputPath, true);
+			Directory.CreateDirectory(outputPath);
+
+			foreach (var entry in entries)
+			{
+				if (!entry.Valid)
+					continue;
+
+				Directory.CreateDirectory($"public/{entry.DestPath}");
+				File.WriteAllText($"public/{entry.Variables["url"]}", generator.Generate(postTemplate, entry.Variables));
+				entry.CopyFiles($"public/{entry.DestPath}");
+			}
 		}
 
 		// copy "content" files 1-1
@@ -218,22 +312,6 @@ class Program
 				Directory.CreateDirectory(fileSubDir); 
 			File.Copy(file, fileDst);
 		}
-	}
-
-	static string LoadTemplate(string file, Dictionary<string, string> partials, Dictionary<string, string>? variables = null)
-	{
-		var result = File.ReadAllText(file);
-
-		foreach (var partial in partials)
-			result = result.Replace($"{{{{partial:{partial.Key}}}}}", partial.Value);
-
-		if (variables != null)
-		{
-			foreach (var pair in variables)
-				result = result.Replace($"{{{{{pair.Key}}}}}", pair.Value);
-		}
-
-		return result;
 	}
 }
 
