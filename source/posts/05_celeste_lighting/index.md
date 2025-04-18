@@ -62,5 +62,3 @@ This allows me to still draw all the light masks in one big pass, and then again
 This method ends up being a lot faster than the Mesh Implementation, as there’s a lot less work on the CPU (constructing all those meshes), and only a minor hit to the GPU. The lights are now some of the fastest code in the game, and we can have a ton of them on-screen at once with very little impact. Yay!
 
 ![Celeste Result]({{path}}/07.gif)
-
-You can check out more about [Celeste here](http://www.celestegame.com/) :)

@@ -1,8 +1,8 @@
 {{partial:header}}
 
 			<div class="post">
+				{{if:postcard}}<img class="postcard" src="{{postcard}}" alt="{{title}} Preview Image"/>{{end}}
 				<h1>{{title}}</h1>
-				{{if:postcard}}<img class="postcard" src="{{postcard}}" alt="{{title}} Postcard Image"/>{{end}}
 				{{if:date}}<h3><i>{{date}}</i></h3><br/>{{end}}
 				
 				<div class="post-body">

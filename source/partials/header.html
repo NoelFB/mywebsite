@@ -2,14 +2,14 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Noel Berry{{page_title}}</title>
+	<title>Noel Berry{{if:title}}{{title}}{{end}}</title>
 	<meta name="description" content="Sometimes, when I'm in the right mood, I make video games and art. Or something.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<meta property="og:title" content="">
-	<meta property="og:type" content="">
-	<meta property="og:url" content="">
-	<meta property="og:image" content="">
+	{{if:title}}<meta property="og:title" content="{{title}}">{{end}}
+	{{if:site_url}}<meta property="og:url" content="{{site_url}}">{{end}}
+	{{if:postcard}}<meta property="og:image" content="{{url}}/{{postcard}}">{{end}}
+	<meta property="og:type" content="article">
 
 	<link rel="apple-touch-icon" href="icon.png">
 	<link rel="preconnect" href="https://fonts.googleapis.com">

@@ -12,7 +12,7 @@ partial class Entry
 	public readonly bool Valid = false;
 	public readonly string DestPath = string.Empty;
 	
-	public Entry(string path, string rel, string type)
+	public Entry(string path, string rel, string site, string type)
 	{
 		SourcePath = path;
 		Type = type;
@@ -77,22 +77,21 @@ partial class Entry
 			}
 		}
 
-		// add page title
-		if (Variables.TryGetValue("title", out string? title))
-			Variables.Add("page_title", " :: " + (title ?? ""));
-
 		// add body, fall back to description
 		if (desc.Length <= 0 && Variables.TryGetValue("description", out string? description) && description != null)
 			Variables.Add("body", description);
 		else
 			Variables.Add("body", desc);
 
+		// parse body as markdown
 		if (Variables.TryGetValue("body", out string? value))
 			Variables["body"] = Markdown.Parse(value);
 
-		// preview / postcard
+		// preview image
 		if (File.Exists(Path.Combine(SourcePath, "preview.png")))
 			Variables.Add("preview", "preview.png");
+
+		// postcard image
 		if (File.Exists(Path.Combine(SourcePath, "postcard.png")))
 			Variables.Add("postcard", "postcard.png");
 
@@ -104,7 +103,8 @@ partial class Entry
 		// add built in vars
 		Variables["rel"] = rel;
 		Variables["path"] = $"{rel}{type}/{Name}";
-		Variables["url"] = $"{Variables["path"]}/index.html";
+		Variables["url"] = $"{rel}{type}/{Name}";
+		Variables["site_url"] = $"{site}{rel}{type}/{Name}";
 
 		// we good here
 		DestPath = $"{type}/{Name}";
@@ -124,7 +124,7 @@ class Generator
 	public readonly Dictionary<string, string> Partials = new(StringComparer.OrdinalIgnoreCase);
 	public readonly Dictionary<string, List<Entry>> Entries = new(StringComparer.OrdinalIgnoreCase);
 
-	public Generator(string path, string[] entryTypes, string rel)
+	public Generator(string path, string[] entryTypes, string rel, string site)
 	{
 		foreach (var file in Directory.EnumerateFiles(Path.Combine(path, "partials")))
 		{
@@ -135,7 +135,7 @@ class Generator
 		{
 			Entries[type] = [];
 			foreach (var dir in Directory.EnumerateDirectories(Path.Combine(path, type)))
-				Entries[type].Add(new Entry(dir, rel, type));
+				Entries[type].Add(new Entry(dir, rel, site, type));
 		}
 	}
 
@@ -206,9 +206,9 @@ class Generator
 
 						// override specific variables
 						var vars = new Dictionary<string, string>();
-						foreach (var kv in entry.Variables)
-							vars[kv.Key] = kv.Value;
 						foreach (var kv in variables)
+							vars[kv.Key] = kv.Value;
+						foreach (var kv in entry.Variables)
 							vars[kv.Key] = kv.Value;
 						list += Generate(Partials[$"{kind}_entry"], vars) + "\n";
 					}
@@ -254,6 +254,7 @@ class Program
 	static void Main(string[] args)
 	{
 		var rel = "/";
+		var site = "https://noelberry.ca";
 
 		var root = Directory.GetCurrentDirectory();
 		while(!File.Exists(Path.Combine(root, "noelfb2022.csproj")))
@@ -265,7 +266,7 @@ class Program
 			Directory.Delete("public", true);
 		Directory.CreateDirectory("public");
 
-		var generator = new Generator("source", ["games", "posts"], rel);
+		var generator = new Generator("source", ["games", "posts"], rel, site);
 
 		// templates
 		var indexTemplate = File.ReadAllText("source/index.html");
@@ -276,7 +277,9 @@ class Program
 			var variables = new Dictionary<string, string>()
 			{
 				{ "rel", rel },
-				{ "page_title", "" },
+				{ "url", rel },
+				{ "site_url", $"{site}{rel}" },
+				{ "postcard", "img/profile.jpg" }
 			};
 
 			var result = generator.Generate(indexTemplate, variables);
@@ -297,7 +300,7 @@ class Program
 					continue;
 
 				Directory.CreateDirectory($"public/{entry.DestPath}");
-				File.WriteAllText($"public/{entry.Variables["url"]}", generator.Generate(postTemplate, entry.Variables));
+				File.WriteAllText($"public/{entry.DestPath}/index.html", generator.Generate(postTemplate, entry.Variables));
 				entry.CopyFiles($"public/{entry.DestPath}");
 			}
 		}
