@@ -19,7 +19,6 @@ My first implementation of the lighting was fairly complicated. I wanted somethi
 ![Mesh Visualization]({{path}}/02.gif)
 
 Which worked like so:
-
 <ul>
 	<li>For each light, create a list of all the wall surfaces within the bounds of the light, and add 4 surfaces at the radius of the light (making that red box around it you see above).</li>
 	<li>Join the surfaces at their corner or at intersections.</li>
@@ -37,7 +36,7 @@ Due to all the subtle problems, I recently decided to re-implement the lights en
 The result, after the light has been drawn and walls have erased their projected shadows, looks like this:
 
 ![Cutout Mask]({{path}}/04.png)
-<center><i>Red is just the mask representation of the light, not necessarily the final light color</i></center>
+<center><i>Red is just the mask representation of the light, not necessarily the final light color</i></center><br/>
 
 This works super well, and is a much simpler solution. However, using the previous Mesh Implementation, I could draw all the lights in a single draw-call since they were just a bunch of vertices. With this Cutout Implementation every light needed to be on their own texture (or a single texture where you swap between the screen and texture for each light).
 
@@ -47,7 +46,7 @@ There’s some places in the game that have a lot of lights. It didn’t make se
 The first optimization is realizing that the mask of the light doesn’t need to use all the channels on a texture (Red, Green, Blue, Alpha), but rather only one. If each light only uses a single channel, we can actually draw 4 overlapping lights per texture:
 
 ![Overlapping Lights]({{path}}/05.png)
-<center><i>2 lights on the same texture</i></center>
+<center><i>2 lights on the same texture</i></center><br/>
 
 Above are 2 separate lights, drawn overlapping on the same texture, one using the Red Channel for its mask, and the other using the Green Channel. When the game draws the light to the screen, it simply uses the channel as a mask (I have a shader that draws the light’s color, but multiplied by the mask of the channel).
 
