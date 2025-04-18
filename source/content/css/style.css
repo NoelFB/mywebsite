@@ -203,6 +203,10 @@ a:hover {
 	margin-bottom: 20px;
 }
 
+.post-title {
+	text-align: center;
+}
+
 .post-body {
 	width: 100%;
 }

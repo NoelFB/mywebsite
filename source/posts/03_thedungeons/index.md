@@ -1,20 +1,19 @@
 {
-	"type": "articles",
-	"order": 19,
 	"title": "Procedural Generation - The Dungeons",
-	"oldurl": "2013/06/procedural-generation-the-dungeons",
-	"disqus": "progen-dungeons"
+	"date": "June, 2013",
+	"oldurl": "2013/06/procedural-generation-the-dungeons"
 }
 ---
-*Moved from an old blog*
+Way back in 2011 I wrote a <a href="{{rel}}posts/thecaves/">blog post</a> on procedurally generating caves based on an algorithm I half made up, and people seemed to really enjoy reading about it. So, I'm going to explain some more procedural generation adventures I've had as I try to make a little action roguelike game.
 
-Way back in 2011 I wrote a <a href="http://noelberry.ca/2011/04/procedural-generation-the-caves/">blog post</a> on procedurally generating caves based on an algorithm I half made up, and people seemed to really enjoy reading about it. So, I'm going to explain some more procedural generation adventures I've had as I try to make a little action roguelike game.
 Before I start explaining, here's a few images of what you can expect from this generation:
 
+<center>
 <a href="http://noelberry.ca/wp-content/uploads/2013/06/procgendun2.png"><img alt="procgendun2" src="http://noelberry.ca/wp-content/uploads/2013/06/procgendun2.png" width="265" height="265" style="display: inline"/></a> 
 <a href="http://noelberry.ca/wp-content/uploads/2013/06/procgendun3.png"><img alt="procgendun3" src="http://noelberry.ca/wp-content/uploads/2013/06/procgendun3.png" width="265" height="265" style="display: inline"/></a>
 <a href="http://noelberry.ca/wp-content/uploads/2013/06/procgendun1.png"><img alt="procgendun1" src="http://noelberry.ca/wp-content/uploads/2013/06/procgendun1.png" width="265" height="265" style="display: inline"/></a>
 <a href="http://noelberry.ca/wp-content/uploads/2013/06/procgendun4.png"><img alt="procgendun1" src="http://noelberry.ca/wp-content/uploads/2013/06/procgendun4.png" width="265" height="265" style="display: inline"/></a>
+</center>
 
 <h2><strong>THE RUNDOWN</strong></h2>
 The goal of this generation (as seen above) is to create a bunch of interconnecting rooms that the player can traverse. All the rooms are either a pre-designed level, or simply a rectangle of a random size. The placing of the rooms is completely random, and the tunnels are then dug between each room in a circular fasion, trying to stay on already-existing paths.

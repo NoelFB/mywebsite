@@ -1,14 +1,10 @@
 {
-	"type": "articles",
-	"order": 19,
-	"disqus": "yearsofgamedev",
-	"oldurl": "2012/07/years-of-game-development-adventures",
 	"title": "(2012) Years of Game Development Adventures",
-	"visible": false
+	"date": "July, 2012",
+	"visible": false,
+	"oldurl": "2012/07/years-of-game-development-adventures",
 }
 ---
-*Moved from an old blog*
-
 I decided it might be interesting to try and explain my game development history, and the commercial games I have created. At the time of writing this blog post, I've sold several of my games to sponsors and done some contract work, so I thought it was a good time to write a post-mortem on how these all went down, what I've learned, and what I want to do in the future. Hopefully some people will find this interesting and useful in their own way.
 
 <a href="http://noelberry.ca/wp-content/uploads/2012/07/rednblue.png"><img src="http://noelberry.ca/wp-content/uploads/2012/07/rednblue.png" alt="" title="rednblue" width="600" height="200" class="aligncenter size-full wp-image-1215" /></a>

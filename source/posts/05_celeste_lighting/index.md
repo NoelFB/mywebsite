@@ -1,8 +1,7 @@
 {
-	"url": "writings/celeste_lighting.html",
 	"title": "Remaking Celeste's Lighting",
 	"date": "Sep 25, 2017",
-	"description": "A technical breakdown on the lighting in Celeste"
+	"description": "A technical breakdown on the lighting in Celeste",
 }
 ---
 A large part of [Celeste](http://www.celestegame.com/) is its mood and atmosphere. We’re trying very hard to make it feel like you’re exploring (and overcoming) a Mountain, and so lighting plays an important role.
@@ -10,7 +9,7 @@ A large part of [Celeste](http://www.celestegame.com/) is its mood and atmospher
 We decided early on the lighting had to interact with the environment. As the game is about maneuvering and climbing through difficult terrain, having simple “Spotlights” wouldn’t cut it — the lights needed to actually hit walls.
 
 ![Lighting Comparison]({{path}}/01.png)
-<center>*Left: Lights that collide with the terrain, Right: “Spotlights” that have no ineraction*</center>
+<center><i>Left: Lights that collide with the terrain, Right: “Spotlights” that have no ineraction</i></center>
 
 ## MESH IMPLEMENTATION
 My first implementation of the lighting was fairly complicated. I wanted something that would be fast and allow us to have lots of lights, so I decided the best way to do this would be to construct a Mesh for each light, and draw them all at once.
@@ -36,7 +35,7 @@ Due to all the subtle problems, I recently decided to re-implement the lights en
 The result, after the light has been drawn and walls have erased their projected shadows, looks like this:
 
 ![Cutout Mask]({{path}}/04.png)
-<center>*Red is just the mask representation of the light, not necessarily the final light color*</center>
+<center><i>Red is just the mask representation of the light, not necessarily the final light color</i></center>
 
 This works super well, and is a much simpler solution. However, using the previous Mesh Implementation, I could draw all the lights in a single draw-call since they were just a bunch of vertices. With this Cutout Implementation every light needed to be on their own texture (or a single texture where you swap between the screen and texture for each light).
 
@@ -46,7 +45,7 @@ There’s some places in the game that have a lot of lights. It didn’t make se
 The first optimization is realizing that the mask of the light doesn’t need to use all the channels on a texture (Red, Green, Blue, Alpha), but rather only one. If each light only uses a single channel, we can actually draw 4 overlapping lights per texture:
 
 ![Overlapping Lights]({{path}}/05.png)
-<center>*2 lights on the same texture*</center>
+<center><i>2 lights on the same texture</i></center>
 
 Above are 2 separate lights, drawn overlapping on the same texture, one using the Red Channel for its mask, and the other using the Green Channel. When the game draws the light to the screen, it simply uses the channel as a mask (I have a shader that draws the light’s color, but multiplied by the mask of the channel).
 

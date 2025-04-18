@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Markdig;
 
 partial class Entry
 {
@@ -85,7 +86,7 @@ partial class Entry
 
 		// parse body as markdown
 		if (Variables.TryGetValue("body", out string? value))
-			Variables["body"] = Markdown.Parse(value);
+			Variables["body"] = value;
 
 		// preview image
 		if (File.Exists(Path.Combine(SourcePath, "preview.png")))
@@ -223,7 +224,7 @@ class Generator
 				// embed variable as content (run generator on var)
 				else if (cmd.StartsWith("embed:") && variables.TryGetValue(cmd[6..].ToString(), out var embedding))
 				{
-					result.Append(Generate(embedding, variables));
+					result.Append(Markdown.ToHtml(Generate(embedding, variables)));
 				}
 				// embed variable as-is
 				else if (variables.TryGetValue(cmd.ToString(), out var value))
@@ -316,42 +317,4 @@ class Program
 			File.Copy(file, fileDst);
 		}
 	}
-}
-
-partial class Markdown
-{
-	public static string Parse(string text)
-	{
-		// hacky mardown parser
-		
-		text = text.Replace("\r", "");
-		text = H3().Replace(text, "<h3>$1</h3>");
-		text = H2().Replace(text, "<h2>$1</h2>");
-		text = H1().Replace(text, "<h1>$1</h1>");
-
-		text = text.Replace("\n<h", "<h");
-		text = text.Replace("\n<ul>", "<ul>");
-		text = text.Replace("</ul>\n", "</ul>");
-		text = text.Replace("\n<li>", "<li>");
-		text = text.Replace("</li>\n", "</li>");
-		text = text.Replace("</h1>\n", "</h1>");
-		text = text.Replace("</h2>\n", "</h2>");
-		text = text.Replace("</h3>\n", "</h3>");
-		text = text.Replace("\n\n", "<br /><br />");
-
-		text = Bold().Replace(text, "<b>$1</b>");
-		text = Italic().Replace(text, "<i>$1</i>");
-		text = Img().Replace(text, "<img alt='$1' src='$2' />");
-		text = Link().Replace(text, "<a href='$2'>$1</a>");
-
-		return text;
-	}
-
-    [GeneratedRegex(@"\n\s?### (.*)\n")] private static partial Regex H3();
-    [GeneratedRegex(@"\n\s?## (.*)\n")] private static partial Regex H2();
-    [GeneratedRegex(@"\n\s?# (.*)\n")] private static partial Regex H1();
-    [GeneratedRegex(@"\*\*([^\*]*)\*\*")] private static partial Regex Bold();
-    [GeneratedRegex(@"\*([^\*]*)\*")] private static partial Regex Italic();
-    [GeneratedRegex(@"!\[(.*?)\]\((.*?)\)")] private static partial Regex Img();
-    [GeneratedRegex(@"\[(.*?)\]\((.*?)\)")] private static partial Regex Link();
 }

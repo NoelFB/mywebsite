@@ -1,15 +1,10 @@
 {
-	"url": "writings/nes.html",
 	"title": "NES Limitations",
 	"date": "Jan 1, 2015",
 	"description": "Breakdown of NES limitations",
-	"oldurl": "/nes",
-	"disqus": "nes-restrictions",
-	"visible": false
+	"visible": false,
 }
 ---
-*Moved from an old blog*
-
 I've been experimenting with making a small game using NES graphical limitations, having been inspired by replaying
 a bunch of Zelda 1 and Zelda 2. I needed a place to write them all down, and so here they are:
 
