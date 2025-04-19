@@ -7,11 +7,10 @@ html {
 body {
 	color: #272446;
 	background: #e1dacd;
+	line-height: 1.5em;
 	font-size: 1.1em;
 	padding: 50px;
 }
-
-h1, h2, h3, h4, p { padding: 0; margin: 0; }
 
 a {
 	color: #37946e;
@@ -24,64 +23,47 @@ a:hover {
 }
 
 .wrapper {
-	width: min(700px, 100%);
+	width: min(800px, 100%);
 	margin: 0px auto;
 }
 
 .header {
 	width: 100%;
-	margin-bottom: 50px;
+	margin-bottom: 40px;
+	border-bottom: 4px dashed #004896;
+	padding-bottom: 40px;
 	display: inline-block;
 }
 
-.header .info {
-	float: left;
-}
-
-.header .info .profile {
-	width: 20%;
-	border-radius: 50%;
-	float: left;
-}
-
-.header .info .about {
-	width: 75%;
-	float: right;
-}
-
-.header .info .about h1 { 
-	font-size: 2.5em;
+.header .name {
+	font-size: 4.0em;
+	line-height: normal;
 	color: #37946e;
-	margin-bottom: 0.25em;
-}
-
-.header .info .about h2 { 
-	font-size: 1.25em;
-	color: #222034;
+	font-weight: bold;
+	text-align: center;
 }
 
 .header .social {
-	width: 100%;
-	padding-top: 10px;
+	margin-top: 10px;
 	text-align: center;
-    display: inline-block;
 }
 .header .social img {
 	image-rendering: pixelated;
 }
+.header .social a:hover img {
+	filter: brightness(0%);
+}
 
 /* Main Content */
 
-.main {
-	line-height: 1.5em;
-	font-size: 1.1em;
-}
 .main h1 { margin-bottom: 15px; }
 .main p { margin-bottom: 15px; }
 .main > .bottom-margin { margin-bottom: 50px; }
 
+.info h2 { margin: 0; }
+
 /* Games */
-.games { margin-bottom: 50px; display: inline-block; }
+.games { margin-bottom: 40px; display: inline-block; }
 .games .entries {
 	width: 100%;
 	float: left;
@@ -206,6 +188,8 @@ a:hover {
 .post-title {
 	text-align: center;
 }
+.post-title h1 { font-weight: bold; }
+.post-title h3 { color: #306082; font-style: italic; }
 
 .post-body {
 	width: 100%;
@@ -333,10 +317,9 @@ a:hover {
 }
 
 .footer .content {
-	border-top: 2px dashed #004896;
+	border-top: 4px dashed #004896;
 	width: 100%;
 	padding-top: 40px;
-	padding-bottom: 40px;
 	margin-top: 40px;
 	font-weight: bold;
 	text-align: center;
