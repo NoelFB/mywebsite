@@ -5,11 +5,11 @@ html {
 }
 
 body {
+	padding: 40px 5vw 40px 5vw;
 	color: #272446;
 	background: #e1dacd;
 	line-height: 1.5em;
 	font-size: 1.1em;
-	padding: 50px;
 }
 
 a {
@@ -52,6 +52,14 @@ a:hover {
 }
 .header .social a:hover img {
 	filter: brightness(0%);
+}
+
+@media (max-width: 880px)
+{
+	body { padding: 5vw; }
+	.header { margin-bottom: 3vw; padding-bottom: 3vw; }
+	.header .name { font-size: 8vw; }
+	.header .social img { width: 8%; }
 }
 
 /* Main Content */
@@ -173,11 +181,6 @@ a:hover {
 	float: left;
 }
 
-.post > h1 {
-	width: 100%;
-	float: left;
-	margin-bottom: 20px;
-}
 .post > .postcard {
 	width: 100%;
 	float: left;
@@ -188,7 +191,7 @@ a:hover {
 .post-title {
 	text-align: center;
 }
-.post-title h1 { font-weight: bold; }
+.post-title h1 { font-weight: bold; line-height: normal; }
 .post-title h3 { color: #306082; font-style: italic; }
 
 .post-body {
@@ -276,7 +279,6 @@ a:hover {
 }
 .toot .display-name {
 	font-weight: bold;
-	width:100%;
 	flex: 1;
 	height: 16px;
 	font-size: 0.9em;
@@ -284,7 +286,6 @@ a:hover {
 }
 .toot .username {
 	display: block;
-	width:100%;
 	flex: 1;
 	height: 16px;
 	font-size: 0.8em;
@@ -308,6 +309,10 @@ a:hover {
 }
 .toot .body p { margin: 0; }
 
+@media (max-width: 600px)
+{
+	.toot .permalink { display: none; }
+}
 
 /* Footer */
 
@@ -324,6 +329,11 @@ a:hover {
 	font-weight: bold;
 	text-align: center;
 	opacity: 0.8;
+}
+
+@media (max-width: 880px)
+{
+	.footer .content { padding-top: 5vw; margin-top: 5vw; }
 }
 
 /* Misc. */
