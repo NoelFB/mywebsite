@@ -94,7 +94,12 @@ partial class Entry
 
 		// postcard image
 		if (File.Exists(Path.Combine(SourcePath, "postcard.png")))
+		{
 			Variables.Add("postcard", "postcard.png");
+			Variables.TryAdd("postcard_visible", "true");
+		}
+		else
+			Variables.Add("postcard_visible", "false");
 
 		// adjust name to skip past numerics of name (000_NAME becomes NAME)
 		Name = Path.GetFileNameWithoutExtension(path);

@@ -22,6 +22,16 @@ a:hover {
 	color: #000;
 }
 
+code {
+	color: #846d70;
+	background: #d9ceb9;
+	border: 1px solid #d4c6ad;
+	border-radius: 4px;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-size: 0.9em;
+}
+
 .wrapper {
 	width: min(800px, 100%);
 	margin: 0px auto;
@@ -223,10 +233,12 @@ a:hover {
 }
 
 .post-body img {
-	max-width: 100%;
+	max-width: 90%;
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
+	border-radius: 8px;
+	box-shadow: 8px 8px 0 #37946e;
 }
 
 .post-links {
