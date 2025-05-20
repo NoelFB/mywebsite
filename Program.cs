@@ -1,7 +1,5 @@
-﻿using System.Runtime.InteropServices.JavaScript;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using Markdig;
 
 partial class Entry
@@ -152,103 +150,103 @@ class Generator
 		var src = template.AsSpan();
 		for (int i = 0; i < src.Length; i ++)
 		{
-			if (src[i..].StartsWith("{{"))
-			{
-				int start = i + 2;
-				int end = start;
-				while (end < src.Length && !src[end..].StartsWith("}}"))
-					end++;
-				if (end >= src.Length)
-				{
-					i = end ;
-					continue;
-				}
-
-				var cmd = src.Slice(start, end - start);
-
-				// handle if statement
-				if (cmd.StartsWith("if:"))
-				{
-					var condition = cmd[3..].ToString();
-					if (!variables.TryGetValue(condition, out var value) || string.IsNullOrEmpty(value) || value == "false")
-					{
-						// skip to end
-						var j = end;
-						var d = 1;
-						while (j < src.Length)
-						{
-							if (src[j..].StartsWith("{{if:"))
-								d++;
-							else if (src[j..].StartsWith("{{end"))
-							{
-								d--;
-								if (d <= 0)
-								{
-									end = j + 5;
-									break;
-								}
-							}
-							j++;
-						}
-					}
-				}
-				// ignore end statement
-				else if (cmd.StartsWith("end"))
-				{
-					// ...
-				}
-				// list entries
-				else if (cmd.StartsWith("list:"))
-				{
-					var list = "";
-					var kind = cmd[5..].ToString();
-					var entries = Entries[kind];
-
-					for (int j = entries.Count - 1; j >= 0; j --)
-					{
-						var entry = entries[j];
-						if (entry.Variables.TryGetValue("visible", out var vis) && vis == "false")
-							continue;
-
-						// override specific variables
-						var vars = new Dictionary<string, string>();
-						foreach (var kv in variables)
-							vars[kv.Key] = kv.Value;
-						foreach (var kv in entry.Variables)
-							vars[kv.Key] = kv.Value;
-						list += Generate(Partials[$"{kind}_entry"], vars) + "\n";
-					}
-
-					result.Append(list);
-				}
-				// embed partial
-				else if (cmd.StartsWith("partial:"))
-				{
-					result.Append(Generate(Partials[cmd[8..].ToString()], variables));
-				}
-				// embed variable as content (run generator on var)
-				else if (cmd.StartsWith("embed:") && variables.TryGetValue(cmd[6..].ToString(), out var embedding))
-				{
-					result.Append(Markdown.ToHtml(Generate(embedding, variables)));
-				}
-				// embed variable as-is
-				else if (variables.TryGetValue(cmd.ToString(), out var value))
-				{
-					result.Append(value);
-				}
-				// missing value
-				else
-				{
-					result.Append("{{MISSING}}");
-				}
-				
-				// skip to end of cmd
-				i = end + 2 - 1;
-			}
-			else
+			if (!src[i..].StartsWith("{{"))
 			{
 				result.Append(src[i]);
+				continue;
 			}
+
+			int start = i + 2;
+			int end = start;
+			while (end < src.Length && !src[end..].StartsWith("}}"))
+				end++;
+			if (end >= src.Length)
+			{
+				i = end ;
+				continue;
+			}
+
+			var cmd = src.Slice(start, end - start);
+
+			// handle if statement
+			if (cmd.StartsWith("if:"))
+			{
+				var condition = cmd[3..].ToString();
+				if (!variables.TryGetValue(condition, out var value) ||
+					string.IsNullOrEmpty(value) || value == "false")
+				{
+					// skip to end
+					var j = end;
+					var d = 1;
+					while (j < src.Length)
+					{
+						if (src[j..].StartsWith("{{if:"))
+							d++;
+						else if (src[j..].StartsWith("{{end"))
+						{
+							d--;
+							if (d <= 0)
+							{
+								end = j + 5;
+								break;
+							}
+						}
+						j++;
+					}
+				}
+			}
+			// ignore end statement
+			else if (cmd.StartsWith("end"))
+			{
+				// ...
+			}
+			// list entries
+			else if (cmd.StartsWith("list:"))
+			{
+				var list = "";
+				var kind = cmd[5..].ToString();
+				var entries = Entries[kind];
+
+				for (int j = entries.Count - 1; j >= 0; j --)
+				{
+					var entry = entries[j];
+					if (entry.Variables.TryGetValue("visible", out var vis) && vis == "false")
+						continue;
+
+					// override specific variables
+					var vars = new Dictionary<string, string>();
+					foreach (var kv in variables)
+						vars[kv.Key] = kv.Value;
+					foreach (var kv in entry.Variables)
+						vars[kv.Key] = kv.Value;
+					list += Generate(Partials[$"{kind}_entry"], vars) + "\n";
+				}
+
+				result.Append(list);
+			}
+			// embed partial
+			else if (cmd.StartsWith("partial:"))
+			{
+				result.Append(Generate(Partials[cmd[8..].ToString()], variables));
+			}
+			// embed variable as content (run generator on var)
+			else if (cmd.StartsWith("embed:") && variables.TryGetValue(cmd[6..].ToString(), out var embedding))
+			{
+				result.Append(Markdown.ToHtml(Generate(embedding, variables)));
+			}
+			// embed variable as-is
+			else if (variables.TryGetValue(cmd.ToString(), out var value))
+			{
+				result.Append(value);
+			}
+			// missing value
+			else
+			{
+				result.Append("{{MISSING}}");
+			}
+			
+			// skip to end of cmd
+			i = end + 2 - 1;
 		}
 
 		return result.ToString();
@@ -257,45 +255,46 @@ class Generator
 
 class Program
 {
+	const string Rel = "/";
+	const string Site = "https://noelberry.ca";
+	const string PublishPath = "public";
+
 	static void Main(string[] args)
 	{
-		var rel = "/";
-		var site = "https://noelberry.ca";
-
 		var root = Directory.GetCurrentDirectory();
 		while(!File.Exists(Path.Combine(root, "noelfb2022.csproj")))
 			root = Path.Combine(root, "..");
 		Directory.SetCurrentDirectory(root);
 
 		// delete public dir
-		if (Directory.Exists("public"))
-			Directory.Delete("public", true);
-		Directory.CreateDirectory("public");
+		if (Directory.Exists(PublishPath))
+			Directory.Delete(PublishPath, true);
+		Directory.CreateDirectory(PublishPath);
 
-		var generator = new Generator("source", ["games", "posts"], rel, site);
+		var generator = new Generator("source", ["games", "posts"], Rel, Site);
 
 		// templates
-		var indexTemplate = File.ReadAllText("source/index.html");
-		var postTemplate = File.ReadAllText("source/post.html");
+		var indexTemplate = File.ReadAllText(Path.Combine("source", "index.html"));
+		var postTemplate = File.ReadAllText(Path.Combine("source", "post.html"));
 
 		// construct index.html
 		{
 			var variables = new Dictionary<string, string>()
 			{
-				{ "rel", rel },
-				{ "url", rel },
-				{ "site_url", $"{site}{rel}" },
+				{ "rel", Rel },
+				{ "url", Rel },
+				{ "site_url", $"{Site}{Rel}" },
 				{ "postcard", "img/profile.jpg" }
 			};
 
 			var result = generator.Generate(indexTemplate, variables);
-			File.WriteAllText("public/index.html", result);
+			File.WriteAllText(Path.Combine(PublishPath, "index.html"), result);
 		}
 
 		// construct post entries
 		foreach (var (type, entries) in generator.Entries)
 		{
-			var outputPath = Path.Combine($"public/{type}");
+			var outputPath = Path.Combine(PublishPath, type);
 			if (Directory.Exists(outputPath))
 				Directory.Delete(outputPath, true);
 			Directory.CreateDirectory(outputPath);
@@ -305,17 +304,19 @@ class Program
 				if (!entry.Valid)
 					continue;
 
-				Directory.CreateDirectory($"public/{entry.DestPath}");
-				File.WriteAllText($"public/{entry.DestPath}/index.html", generator.Generate(postTemplate, entry.Variables));
-				entry.CopyFiles($"public/{entry.DestPath}");
+				Directory.CreateDirectory(Path.Combine(PublishPath, entry.DestPath));
+				File.WriteAllText(
+					Path.Combine(PublishPath, entry.DestPath, "index.html"),
+					generator.Generate(postTemplate, entry.Variables));
+				entry.CopyFiles(Path.Combine(PublishPath, entry.DestPath));
 			}
 		}
 
 		// copy "content" files 1-1
-		var contentSrcPath = Path.Combine(Directory.GetCurrentDirectory(), "source/content"); 
+		var contentSrcPath = Path.Combine(Directory.GetCurrentDirectory(), "source", "content"); 
 		foreach (var file in Directory.EnumerateFiles(contentSrcPath, "*.*", SearchOption.AllDirectories))
 		{
-			var fileDst = Path.Combine("public", Path.GetRelativePath(contentSrcPath, file));
+			var fileDst = Path.Combine(PublishPath, Path.GetRelativePath(contentSrcPath, file));
 			var fileSubDir = Path.GetDirectoryName(fileDst);
 			if (!string.IsNullOrWhiteSpace(fileSubDir) && !Directory.Exists(fileSubDir))
 				Directory.CreateDirectory(fileSubDir); 
@@ -343,14 +344,14 @@ class Program
 
 				rss.AppendLine("\t\t<item>");
 				rss.AppendLine($"\t\t\t<title>{post.Variables["title"]}</title>");
-				rss.AppendLine($"\t\t\t<link>{site}/{post.DestPath}/index.html</link>");
+				rss.AppendLine($"\t\t\t<link>{Site}/{post.DestPath}/index.html</link>");
 				rss.AppendLine($"\t\t\t<description>{post.Variables.GetValueOrDefault("description")}</description>");
 				rss.AppendLine($"\t\t\t<pubDate>{rssDate}</pubDate>");
 				rss.AppendLine("\t\t</item>");
 			}
 			rss.AppendLine("\t</channel>");
-			rss.AppendLine("</rss> ");
-			File.WriteAllText(Path.Combine("public", "rss.xml"), rss.ToString());
+			rss.AppendLine("</rss>");
+			File.WriteAllText(Path.Combine(PublishPath, "rss.xml"), rss.ToString());
 		}
 	}
 }
