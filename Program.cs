@@ -321,5 +321,36 @@ class Program
 				Directory.CreateDirectory(fileSubDir); 
 			File.Copy(file, fileDst);
 		}
+
+		// create RSS feed
+		{
+			var rss = new StringBuilder();
+			rss.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+			rss.AppendLine("<rss version=\"2.0\">");
+			rss.AppendLine("\t<channel>");
+			rss.AppendLine("\t\t<title>Noel Berry</title>");
+			rss.AppendLine("\t\t<link>https://noelberry.ca</link>");
+			rss.AppendLine("\t\t<language>en-us</language>");
+			rss.AppendLine("\t\t<description>Sometimes, when I'm in the right mood, I make video games and art. Or something.</description>");
+			foreach (var post in generator.Entries["posts"].Reverse<Entry>())
+			{
+				if (!post.Valid || 
+					post.Variables.GetValueOrDefault("visible") == "false")
+					continue;
+
+				var date = DateTime.Parse(post.Variables["date"]);
+				var rssDate = date.ToString("ddd, dd MMM yyyy HH:mm:ss zzz");
+
+				rss.AppendLine("\t\t<item>");
+				rss.AppendLine($"\t\t\t<title>{post.Variables["title"]}</title>");
+				rss.AppendLine($"\t\t\t<link>{site}/{post.DestPath}/index.html</link>");
+				rss.AppendLine($"\t\t\t<description>{post.Variables.GetValueOrDefault("description")}</description>");
+				rss.AppendLine($"\t\t\t<pubDate>{rssDate}</pubDate>");
+				rss.AppendLine("\t\t</item>");
+			}
+			rss.AppendLine("\t</channel>");
+			rss.AppendLine("</rss> ");
+			File.WriteAllText(Path.Combine("public", "rss.xml"), rss.ToString());
+		}
 	}
 }

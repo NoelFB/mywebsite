@@ -1,6 +1,6 @@
 {
 	"title": "Procedural Generation - The Caves",
-	"date": "~2011",
+	"date": "April, 2011",
 	"oldurl": "2011/04/procedural-generation-the-caves",
 }
 ---
