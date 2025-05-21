@@ -37,26 +37,28 @@ partial class Entry
 			var key = entry.Name.ToLower();
 			if (key == "links" && entry.Value.ValueKind == JsonValueKind.Array)
 			{
-				string links = "";
+				var links = new StringBuilder();
 
-				foreach (var link_entry in entry.Value.EnumerateArray())
+				foreach (var linkEntry in entry.Value.EnumerateArray())
 				{
-					if (link_entry.ValueKind != JsonValueKind.Object)
+					if (linkEntry.ValueKind != JsonValueKind.Object)
 						continue;
 
-					string link_url = "";
-					string link_label = "";
+					var linkUrl = "";
+					var linkLabel = "";
 
-					foreach (var pair in link_entry.EnumerateObject())
+					foreach (var pair in linkEntry.EnumerateObject())
 					{
-						if (pair.Name == "url") link_url = pair.Value.GetString() ?? "";
-						if (pair.Name == "label") link_label = pair.Value.GetString() ?? "";
+						if (pair.Name == "url")
+							linkUrl = pair.Value.GetString() ?? "";
+						if (pair.Name == "label")
+							linkLabel = pair.Value.GetString() ?? "";
 					}
 
-					links += $"<a href=\"{link_url}\">{link_label}</a><br />\n";
+					links.AppendLine($"<a href=\"{linkUrl}\">{linkLabel}</a><br />");
 				}
 
-				Variables.Add("links", links);
+				Variables.Add("links", links.ToString());
 			}
 			else if (entry.Value.ValueKind == JsonValueKind.String)
 			{
@@ -77,13 +79,14 @@ partial class Entry
 		}
 
 		// add body, fall back to description
-		if (desc.Length <= 0 && Variables.TryGetValue("description", out string? description) && description != null)
+		if (desc.Length <= 0 && Variables.TryGetValue("description", out var description) &&
+			description != null)
 			Variables.Add("body", description);
 		else
 			Variables.Add("body", desc);
 
 		// parse body as markdown
-		if (Variables.TryGetValue("body", out string? value))
+		if (Variables.TryGetValue("body", out var value))
 			Variables["body"] = value;
 
 		// preview image
@@ -291,7 +294,7 @@ class Program
 			File.WriteAllText(Path.Combine(PublishPath, "index.html"), result);
 		}
 
-		// construct post entries
+		// construct game/post entries
 		foreach (var (type, entries) in generator.Entries)
 		{
 			var outputPath = Path.Combine(PublishPath, type);
