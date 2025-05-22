@@ -13,7 +13,7 @@ It's 2025 and I am still making video games, which [according to archive.org](ht
 
 When I share stuff I'm working on, people frequently ask how I make games and are often surprised (and sometimes concerned?) when I tell them I don't use commercial game engines. There's an assumption around making games without a big tool like Unity or Unreal that you're out there hand writing your own assembly instruction by instruction.
 
-I genuinely believe making games without a big "do everything" engine can be easier, more fun, and often less overhead. I am not making a "do everything" game and I do not need 90% of the features these engines provide. I am very particular about how my games feel and look, and how I interact with my tools. I often find the default feature implementations in large engines like Unity so lacking I end up writing my own anyway. Eventually, my projects end up being mostly my own tools and systems, and the engine becomes just a vehicle for a nice UI and some rendering... 
+I genuinely believe making games without a big "do everything" engine can be easier, more fun, and often less overhead. I am not making a "do everything" game and I do not need 90% of the features these engines provide. I am very particular about how my games feel and look, and how I interact with my tools. I often find the default feature implementations in large engines like Unity so lacking I end up writing my own anyway. Eventually, my projects end up being mostly my own tools and systems, and the engine becomes just a vehicle for a nice UI and some rendering...
 
 At which point, why am I using this engine? What is it providing me? Why am I letting a tool potentially destroy my ability to work when they suddenly make [unethical and terrible business decisions](https://www.theverge.com/2023/9/12/23870547/unit-price-change-game-development)? Or push out an update that they require to run my game on consoles, that also happens to break an entire system in my game, forcing me to rewrite it? Why am I fighting this thing daily for what essentially becomes a glorified asset loader and editor UI framework, by the time I'm done working around their default systems?
 
@@ -27,7 +27,7 @@ With that all said, I think it'd be fun to talk about my workflow, and what I ac
 
 Most of my career I've worked in C#, and aside from a [short stint in C++](https://github.com/noelfb/blah) a few years ago, I've settled back into a modern C# workflow.
 
-I think sometimes when I mention C# to non-indie game devs their minds jump to what it looked like circa 2003 - a closed source, interpreted, verbose, garbage collected language, and... the language has *greatly* improved since then. The C# of 2025 is vastly different from the C# of even 2015, and many of those changes are geared towards the performance and syntax of the langauge. You can allocate dynamically sized arrays on the stack! `C++` can't do that (*although `C99` can ;) ...*).
+I think sometimes when I mention C# to non-indie game devs their minds jump to what it looked like circa 2003 - a closed source, interpreted, verbose, garbage collected language, and... the language has *greatly* improved since then. The C# of 2025 is vastly different from the C# of even 2015, and many of those changes are geared towards the performance and syntax of the language. You can allocate dynamically sized arrays on the stack! `C++` can't do that (*although `C99` can ;) ...*).
 
 The dotnet developers have also implemented hot reload in C# (which works... *most of the time*), and it's pretty fantastic for game development. You can launch your project with `dotnet watch` and it will live-update code changes, which is amazing when you want to change how something draws or the way an enemy updates.
 
@@ -50,7 +50,7 @@ I have been using [SDL3](https://wiki.libsdl.org/SDL3/FrontPage) as it does ever
 
 That said, I have written [my own C# layer](https://github.com/FosterFramework/Foster) on top of SDL for general rendering and input utilities I share across projects. I make highly opinionated choices about how I structure my games so I like having this little layer to interface with. It works really well for my needs, but there are full-featured alternatives like [MoonWorks](https://github.com/MoonsideGames/MoonWorks) that fill a similar space.
 
-Before SDL3's release with the GPU abstraction, I was writing my own OpenGL and DirectX implementations - which isn't trivial! But it was a [great learning experience](https://learnopengl.com/), and not as bad as I expected it to be. I am however, very greatful for SDL GPU as it is a very solid foundation that will be tested across millions of devices.
+Before SDL3's release with the GPU abstraction, I was writing my own OpenGL and DirectX implementations - which isn't trivial! But it was a [great learning experience](https://learnopengl.com/), and not as bad as I expected it to be. I am however, very grateful for SDL GPU as it is a very solid foundation that will be tested across millions of devices.
 
 Finally, for Audio we're using [FMOD](https://www.fmod.com/). This is the last proprietary tool in our workflow, which I don't love (especially [when something stops working](https://www.reddit.com/r/linux_gaming/comments/1ijcfnt/celeste_not_finding_libfmodstudioso10/) and you have to hand-patch their library), but it's the best tool for the job. There are more lightweight open source libraries if you just want to play sounds, but I work with audio teams that want finite control over dynamic audio, and a tool like FMOD is a requirement.
 
@@ -100,7 +100,7 @@ There are of course certain workflows and tools that do not work on Linux, and t
 ## Miscellaneous thoughts
 
 - **What about Godot?**<br/>If you're in the position to want the things a larger game engine provides, I definitely think [Godot](https://godotengine.org/) is the best option. That it is open-source and community-maintained eliminates a lot of the issues I have with other proprietary game engines, but it still isn't usually the way I want to make games. I do intend to play around with it in the future for some specific ideas I have.
-- **What about 3D?**<br/>I think that using big engines definitely have more of a place for 3D games - but even so for any kind of 3D project I want to do, I would roll my own little framework. I want to make highly stylized games that do not require very modern tech, and I have found that to be fairly straight forward (for example, we made [Celeste 64](https://github.com/exok/celeste64) without very much prior 3D knowledge in under 2 weeks).
+- **What about 3D?**<br/>I think that using big engines definitely has more of a place for 3D games - but even so for any kind of 3D project I want to do, I would roll my own little framework. I want to make highly stylized games that do not require very modern tech, and I have found that to be fairly straight forward (for example, we made [Celeste 64](https://github.com/exok/celeste64) without very much prior 3D knowledge in under 2 weeks).
 
 	![Celeste 64 screenshot]({{path}}/celeste64.jpeg)
 	*<center>Celeste 64 Screenshot</center>*
